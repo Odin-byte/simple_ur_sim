@@ -1,0 +1,16 @@
+{
+    "robots": [
+        {
+            "name": "UR5e",
+            "type": "robotic arm",
+            "manufacturer": "Universal Robots",
+            "xacro-generated": true,
+            "urdf": [
+                "urdf/ur5e.urdf"
+            ],
+            "variant": null,
+            "source-link": "https://github.com/ros-industrial/universal_robot/tree/6507bb6756d0065d49b76230ff55f875f099a827/ur_description",
+            "id": 244
+        }
+    ]
+}
