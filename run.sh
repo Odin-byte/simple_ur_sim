@@ -19,6 +19,9 @@ if [ ! -f $XAUTH ]; then
     chmod 777 $XAUTH
 fi
 
+# Allow for x forwarding
+xhost +local:
+
 # Notify the user
 echo "Docker container '$CONTAINER_NAME' starting."
 
