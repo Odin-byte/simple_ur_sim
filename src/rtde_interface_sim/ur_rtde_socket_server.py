@@ -112,6 +112,8 @@ class UrRtdeServer:
         send_feedback()
 
     def send_feedback_msg(self):
+        """Wrapper function for the timer based feedback thread
+        """
         if self.con:
             try:
                 self.send_feedback_data_msg()
@@ -122,6 +124,9 @@ class UrRtdeServer:
         """Stop the threaded TCP Server
         """
         self.server_thread.join(timeout=1)
+        if self.feedback_thread != None:
+            self.feedback_thread.join(timeout=1)
+        
         logging.info("Server stopped")
 
     def set_robot_status(self, joint_positions: tuple, tcp_pose: tuple):
@@ -133,7 +138,15 @@ class UrRtdeServer:
         """
         return
     
-    def decode_rtde_message(self, data):
+    def decode_rtde_message(self, data:bytearray) -> tuple:
+        """Decode a RTDE bytearray and extract the message length, type and its payload
+
+        Args:
+            data (bytestring): RTDE msg as a bytestring
+
+        Returns:
+            tuple: Tuple of structure (int, int, bytearray) containing the msg lenght, type and its payload
+        """
         if len(data) < 3:
             logging.error("Received message with invalid length: less than 3 bytes")
             return None, None, None
@@ -151,16 +164,33 @@ class UrRtdeServer:
             logging.error(f"Error unpacking RTDE message: {e}")
             return None, None, None
         
-    def handle_request_protocol_version(self, payload):
+    def handle_request_protocol_version(self, payload:bytearray):
+        """Extracts the needed information from the payload of a request protocol version RTDE msg
+
+        Args:
+            payload (bytearray): Payload of a RTDE Request protocol version msg
+        """
         version = struct.unpack(">H", payload)[0]  # uint16 aus Nutzdaten extrahieren
         response = struct.pack(">H B B", 4, 0x56, 1)  # Länge, Typ, Version
         self.con.sendall(response)
 
     def handle_get_ur_control_version(self, payload):
+        """Handles the request of the UR control version. This is a dummy function
+
+        Args:
+            payload (bytearray): Payload of a RTDE Request UR control version msg
+        """
         response = struct.pack(">H B I I I I", 19, 118, 3, 2, 19171, 42)
         self.con.sendall(response)
     
-    def handle_control_package_setup_outputs(self, payload):
+    def handle_control_package_setup_outputs(self, payload:bytearray):
+        """Handles incomming RTDE control package setup output msg.
+        Extracts the requested feedback parameters and the corresponding structure, sends a confirmation and starts the timer based
+        feedback loop.
+
+        Args:
+            payload (bytearray): Payload of a RTDE Control package setup outputs msg
+        """
         self.feedback_frequency = (struct.unpack(">d", payload[:8])[0])
 
         params = payload[8:].decode(errors="ignore").strip().split(",")
@@ -171,7 +201,6 @@ class UrRtdeServer:
             if requested_param in self.available_params.keys():
                 param_types.append(self.available_params[requested_param])
                 self.feedback_registers.append(requested_param)
-                # self.feedback_values.append(None)
             else:
                 param_types.append("NOT_FOUND")
                 output_recipe_id = 0
@@ -191,7 +220,13 @@ class UrRtdeServer:
 
         self.start_feedback_loop()
     
-    def handle_control_package_setup_inputs(self, payload):
+    def handle_control_package_setup_inputs(self, payload:bytearray):
+        """Handles incomming RTDE control package setup inputs msg.
+        Extracts the requested input registers and the corresponding structure, sends a confirmation msg to the controller.
+
+        Args:
+            payload (bytearray): Payload of a RTDE Control package setup inputs msg
+        """
         params = payload.decode(errors="ignore").strip().split(",")
         param_types = []
         output_recipe_id = 1
@@ -215,16 +250,18 @@ class UrRtdeServer:
         response = struct.pack(f">H B B {len(response_byte_string)}s", msg_len, msg_type, output_recipe_id, response_byte_string)
         self.con.sendall(response)
     
-    def handle_control_package_start(self, payload):
-        # Has no payload
+    def handle_control_package_start(self):
+        """Handles a RTDE control package start msg. Sends feedback msg if the server is ready to start the message loop.
+        """
         msg_len = 4
         msg_type = 83
         # This fake hardware controller always accepts -> 1
         response = struct.pack(f">H B B", msg_len, msg_type, 1)
         self.con.sendall(response)
 
-    def handle_control_package_pause(self, payload):
-        # Has no payload
+    def handle_control_package_pause(self):
+        """Handles a RTDE control package pause msg. Sends feedback msg if the server is able to pause the message loop.
+        """
         msg_len = 4
         msg_type = 80
         # This fake hardware controller always accepts -> 1
@@ -232,6 +269,8 @@ class UrRtdeServer:
         self.con.sendall(response)
 
     def send_feedback_data_msg(self):
+        """Reads the current server internal values of the requested feedback registers and sends a RTDE Data msg to the controller.
+        """
         # Use the defined feedback structure string and populate the msg with the current values of the feedback registers
         try:
             list_feedback_values = []
@@ -253,7 +292,13 @@ class UrRtdeServer:
         except socket.error as e:
             logging.error(f"Error sending feedback data: {e}")
 
-    def handle_data_package(self, payload):
+    def handle_data_package(self, payload:bytearray):
+        """Handles an incomming RTDE Data msg payload. Reads out the requested values for the defined input registers and resends 
+        an extra feedback msg as confirmation to the controller.
+
+        Args:
+            payload (bytearray): _description_
+        """
         # Unpack the control data send by the controller based on the latest control byte structure string
         control_values = struct.unpack(self.control_data_structure, payload[1:])
         for i, value in enumerate(control_values):
@@ -262,7 +307,14 @@ class UrRtdeServer:
         # Send feedback msg
         self.send_feedback_data_msg()
 
-    def handle_rtde_payload(self, type, payload, msg_len):
+    def handle_rtde_payload(self, type:int, payload:bytearray, msg_len:int):
+        """Handles general RTDE msg payloads, checks for payload itegrity and calls the method corresponding to the payload type.
+
+        Args:
+            type (int): Type of RTDE payload
+            payload (bytearray): Data payload of RTDE msg
+            msg_len (int): Length of the entire RTDE msg including payload and header
+        """
         logging.debug(f"Handling packet type: {type}")
     
         # Check for correct length of payload
@@ -273,17 +325,17 @@ class UrRtdeServer:
             return
         # Handle known package types
         if type == 86:
-            return self.handle_request_protocol_version(payload)
+            self.handle_request_protocol_version(payload)
         elif type == 118:
-            return self.handle_get_ur_control_version(payload)
+            self.handle_get_ur_control_version(payload)
         elif type == 79:
-            return self.handle_control_package_setup_outputs(payload)
+            self.handle_control_package_setup_outputs(payload)
         elif type == 73:
-            return self.handle_control_package_setup_inputs(payload)
+            self.handle_control_package_setup_inputs(payload)
         elif type == 83:
-            return self.handle_control_package_start(payload)
+            self.handle_control_package_start(payload)
         elif type == 85:
-            return self.handle_data_package(payload)
+            self.handle_data_package(payload)
         else:
             logging.error(f"Unknown RTDE payload type received: {type}")
 
