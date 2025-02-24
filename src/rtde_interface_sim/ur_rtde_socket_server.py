@@ -24,6 +24,7 @@ class UrRtdeServer:
         self.feedback_frequency = None
         self.feedback_thread = None
         
+        #TODO: This is pure interpretation. The send vector could also be the requested TCP pose. If that is the case the hardcoded set method needs to be rewritten
         # Set by the controller
         self.joint_positions = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         
@@ -95,10 +96,12 @@ class UrRtdeServer:
     def start(self):
         """Start the server in a separate thread."""
         self.server_thread.start()
-        print("RTDE Interface Server running in background...")
+        logging.info("RTDE Interface Server running in background...")
 
     def start_feedback_loop(self):
-        print("Starting feedback loop!")
+        """Starting seperate thread to enable async feedback msgs to the controller.
+        """
+        logging.info("Starting RTDE feedback loop!")
         if self.feedback_thread:
             self.feedback_thread.cancel()
 
@@ -141,6 +144,7 @@ class UrRtdeServer:
         self.output_int_register_0 = 0
         return
     
+    #TODO: This function does interpret the send register values as joint values. This might not be the case for every application.
     def get_control_values(self):
         """Get the latest joint positions requested by the controller.
 
@@ -181,8 +185,8 @@ class UrRtdeServer:
         Args:
             payload (bytearray): Payload of a RTDE Request protocol version msg
         """
-        version = struct.unpack(">H", payload)[0]  # uint16 aus Nutzdaten extrahieren
-        response = struct.pack(">H B B", 4, 0x56, 1)  # Länge, Typ, Version
+        version = struct.unpack(">H", payload)[0]  # uint16
+        response = struct.pack(">H B B", 4, 0x56, 1)
         self.con.sendall(response)
 
     def handle_get_ur_control_version(self, payload):
@@ -287,8 +291,6 @@ class UrRtdeServer:
             list_feedback_values = []
             for requested_value in self.feedback_registers:
                 value = getattr(self, requested_value, None)
-                if requested_value == "actual_TCP_pose":
-                    print(f"Send TCP pose: {value}")
                 if isinstance(value, list):
                     list_feedback_values.extend(value)
                 else:
@@ -346,16 +348,17 @@ class UrRtdeServer:
             self.handle_control_package_setup_inputs(payload)
         elif type == 83:
             self.handle_control_package_start()
+        elif type == 80:
+            self.handle_control_package_pause()
         elif type == 85:
             self.handle_data_package(payload)
         else:
             logging.error(f"Unknown RTDE payload type received: {type}")
 
-# Example of running the server in a separate thread
+
 if __name__ == "__main__":
     server = UrRtdeServer()
     server.start()
 
-    # Simulating main script
     while True:
-        pass  # Your main program logic here
+        pass
