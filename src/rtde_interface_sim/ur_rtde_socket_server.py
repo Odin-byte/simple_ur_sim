@@ -31,14 +31,12 @@ class UrRtdeServer:
         # Read in from the simulation and sent to the controller as feedback
         self.actual_TCP_pose = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.actual_q = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.output_int_register_0 = 0
 
         self.available_params = {
             "actual_TCP_pose" : "VECTOR6D",
             "actual_q" : "VECTOR6D",
             "actual_qd" : "VECTOR6D",
             "target_qd" : "VECTOR6D",
-            "output_int_register_0" : "INT32",
             "input_double_register_0" : "DOUBLE",
             "input_double_register_1" : "DOUBLE",
             "input_double_register_2" : "DOUBLE",
@@ -141,7 +139,6 @@ class UrRtdeServer:
         """
         self.actual_TCP_pose = tcp_pose
         self.actual_q = joint_positions
-        self.output_int_register_0 = 0
         return
     
     #TODO: This function does interpret the send register values as joint values. This might not be the case for every application.
