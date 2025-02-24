@@ -13,8 +13,8 @@ class UrRtdeServer:
     This class is to be used in combination with a pybullet simulation of a UR Robot.
     """
 
-    def __init__(self, host_ip="127.0.0.1", port=30004, direct_unit_read=True):
-        """Initialize the server object """
+    def __init__(self, host_ip="127.0.0.1", port=30004):
+        """Initialize the server object simulating the RTDE interface provided by UR."""
         self.host_ip = host_ip
         self.port = port
         self.server_thread = threading.Thread(target=self.run_server, daemon=True)
@@ -136,7 +136,18 @@ class UrRtdeServer:
             joint_positions (tuple): Current joint positions of the simulated robot
             tcp_pose (tuple): Current TCP pose of the robot in the world frame of the pybullet simulation
         """
+        self.actual_TCP_pose = tcp_pose
+        self.actual_q = joint_positions
+        self.output_int_register_0 = 0
         return
+    
+    def get_control_values(self):
+        """Get the latest joint positions requested by the controller.
+
+        Returns:
+            joint_positions (list): Latest requested joint positions by the controller in radians.
+        """
+        return self.control_values
     
     def decode_rtde_message(self, data:bytearray) -> tuple:
         """Decode a RTDE bytearray and extract the message length, type and its payload
@@ -276,10 +287,13 @@ class UrRtdeServer:
             list_feedback_values = []
             for requested_value in self.feedback_registers:
                 value = getattr(self, requested_value, None)
+                if requested_value == "actual_TCP_pose":
+                    print(f"Send TCP pose: {value}")
                 if isinstance(value, list):
                     list_feedback_values.extend(value)
                 else:
                     list_feedback_values.append(value)
+            logging.debug(f"Sending feedback: {list_feedback_values}")
             # Generate the bytestring containing the feedback values
             feedback_value_bytes = struct.pack(self.feedback_data_structure, *list_feedback_values)
             msg_type = 85
@@ -315,8 +329,6 @@ class UrRtdeServer:
             payload (bytearray): Data payload of RTDE msg
             msg_len (int): Length of the entire RTDE msg including payload and header
         """
-        logging.debug(f"Handling packet type: {type}")
-    
         # Check for correct length of payload
         if len(payload) > msg_len - 3:
             payload = payload[:msg_len - 3]
@@ -333,7 +345,7 @@ class UrRtdeServer:
         elif type == 73:
             self.handle_control_package_setup_inputs(payload)
         elif type == 83:
-            self.handle_control_package_start(payload)
+            self.handle_control_package_start()
         elif type == 85:
             self.handle_data_package(payload)
         else:
