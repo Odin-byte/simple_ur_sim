@@ -11,7 +11,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-from fts_driver_sim.axia_socket_server import FtnAxiaServer
+from fts_interface_sim.axia_socket_server import FtnAxiaServer
 from rtde_interface_sim.ur_rtde_socket_server import UrRtdeServer
 
 # Constants for joint indices and target positions
@@ -146,46 +146,6 @@ def set_initial_joint_positions(ur5e_id):
         targetPositions=joint_positions,
     )
 
-#DEBUG
-def move_robot_to_target_position(ur5e_id, ft_server, steps):
-    """Move the robot based on function internal timesteps and positions
-
-    Args:
-        ur5e_id (int): Integer used to refer to the kinematic chain of the simulated UR robot
-        ft_server (FtnAxiaServer): Simulated Schunk Axia Sensor TCP Server object
-        steps (int): Current timestep of the simulation
-    """
-    if steps >= 500:
-        target_pos = [-0.8, -0.2, 0.65]
-        target_orientation = p.getQuaternionFromEuler([0, -math.pi, 0])
-        p.setJointMotorControlArray(
-            ur5e_id,
-            jointIndices=JOINT_INDICES,
-            controlMode=p.POSITION_CONTROL,
-            targetPositions=p.calculateInverseKinematics(
-                ur5e_id,
-                endEffectorLinkIndex=10,
-                targetPosition=target_pos,
-                targetOrientation=target_orientation,
-            ),
-        )
-
-    if steps >= 700:
-        target_pos = [-0.8, -0.2, 0.633]
-        p.setJointMotorControlArray(
-            ur5e_id,
-            jointIndices=JOINT_INDICES,
-            controlMode=p.POSITION_CONTROL,
-            targetPositions=p.calculateInverseKinematics(
-                ur5e_id,
-                endEffectorLinkIndex=10,
-                targetPosition=target_pos,
-                targetOrientation=target_orientation,
-            ),
-        )
-
-    ft_server.set_values(p.getJointState(ur5e_id, 9))
-
 
 # Main loop to run the simulation
 def run_simulation():
@@ -199,6 +159,7 @@ def run_simulation():
         ft_server = init_ft_sensor_server()
         enable_ft_sensor(ur5e_id)
         set_initial_joint_positions(ur5e_id)
+        p.stepSimulation()
 
         while True:
             # Get control signal from the rtde server
@@ -218,13 +179,14 @@ def run_simulation():
             actual_joint_positions = [
                 state[0] for state in p.getJointStates(ur5e_id, JOINT_INDICES)
             ]
-            # print(f"Joint states from sim: {actual_joint_positions}")
             actual_TCP_pose = p.getLinkState(ur5e_id, 10, computeForwardKinematics=1)[
                 :2
             ]
             actual_TCP_base = transform_tcp_to_base(actual_TCP_pose)
-            # print(f"TCP Pose Sim: {actual_TCP_pose} in Base: {actual_TCP_base}")
+
             rtde_server.set_robot_status(actual_joint_positions, actual_TCP_base)
+            # Get sensor values from simulation
+            ft_server.set_values(p.getJointState(ur5e_id, 9))
             time.sleep(0.01)  # Simulation time step
             steps += 1
 
