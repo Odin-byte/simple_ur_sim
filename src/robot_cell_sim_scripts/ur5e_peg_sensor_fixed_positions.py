@@ -12,7 +12,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 from fts_interface_sim.axia_socket_server import FtnAxiaServer
-from rtde_interface_sim.ur_rtde_socket_server import UrRtdeServer
 
 # Constants for joint indices and target positions
 JOINT_INDICES = list(range(2, 8))
@@ -212,8 +211,6 @@ def set_initial_joint_positions(ur5e_id):
         targetPositions=joint_positions,
     )
 
-
-# DEBUG
 def get_time_based_robot_position(ur5e_id, steps):
     """Move the robot based on function internal timesteps and positions
 
