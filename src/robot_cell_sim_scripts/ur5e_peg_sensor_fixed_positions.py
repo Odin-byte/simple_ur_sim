@@ -11,7 +11,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-from fts_driver_sim.axia_socket_server import FtnAxiaServer
+from fts_interface_sim.axia_socket_server import FtnAxiaServer
 from rtde_interface_sim.ur_rtde_socket_server import UrRtdeServer
 
 # Constants for joint indices and target positions
