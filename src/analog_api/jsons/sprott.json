@@ -1,0 +1,17 @@
+{
+  "name": "sprott",
+  "functions": [
+    "X(t)", "Y(t)", "Z(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]": "Y + Z",
+    "diff[Y, t]": "0.5 * Y - X",
+    "diff[Z, t]": "5 * X * X - Z"
+  },
+  "conditions": {
+    "Y(t: 0)": -0.1
+  },
+  "outputs": ["X(t)", "Y(t)"],
+  "displays": ["plot(x: X(t), y: Y(t))"]
+}

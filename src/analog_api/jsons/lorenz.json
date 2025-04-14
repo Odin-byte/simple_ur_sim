@@ -1,0 +1,28 @@
+{
+  "name": "lorenz",
+  "functions": [
+    "X(t)",
+    "Y(t)",
+    "Z(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]": "1.8 * Y - X",
+    "s": "1 - 2.678 * Z",
+    "diff[Y, t]": "(1.56 * X * s) - (0.1 * Y)",
+    "diff[Z, t]": "(1.5 * X * Y) - (0.2667 * Z)"
+  },
+  "conditions": {
+    "X(t: 0)": -1.0,
+    "Y(t: 0)": -1.0,
+    "Z(t: 0)": 0.0
+  },
+  "outputs": [
+    "X(t)",
+    "Y(t)",
+    "Z(t)"
+  ],
+  "displays": [
+    "plot(x: X(t), y: Y(t))"
+  ]
+}

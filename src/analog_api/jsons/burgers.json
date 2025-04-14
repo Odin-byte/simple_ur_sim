@@ -1,0 +1,15 @@
+{
+  "name": "burgers",
+  "functions": [
+    "U(t, x)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[U, t]": "-U * diff[U, x]"
+  },
+  "conditions": {
+    "U(0, x)": "sphere(pos: x, center: 0.5, radius: 0.25, inside: 1.0, outside: 0)"
+  },
+  "displays": ["plot(x, U(t, x))"],
+  "outputs": ["U(t, x: 0.5, y: 0.5)"]
+}

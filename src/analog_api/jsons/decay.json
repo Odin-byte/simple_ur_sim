@@ -1,0 +1,18 @@
+{
+  "name": "decay",
+  "functions": [
+    "X(t)"
+  ],
+  "parameters": [
+    "n0",
+    "lambda"
+  ],
+  "conditions": {
+    "X(t: 0)": "0.8"
+  },
+  "equations": {
+    "diff[X, t]": "-0.8 * X"
+  },
+  "outputs": ["X(t)"],
+  "displays": ["plot(x: t * 0.02 - 1.0, y: X(t))"]
+}

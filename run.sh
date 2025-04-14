@@ -33,6 +33,6 @@ docker run -it --rm \
     --env XAUTHORITY=$XAUTH \
     --volume $XSOCK:$XSOCK:rw \
     --volume $XAUTH:$XAUTH:rw \
-    --volume ./src:/ur_sim/src:rw \
+    --volume ./src:/home/docker/ros_ws/src \
     --privileged \
     $IMAGE_NAME

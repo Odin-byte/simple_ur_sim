@@ -1,0 +1,15 @@
+{
+  "name": "roy",
+  "functions": [
+    "S(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[S, t]": "sqrt( 1 + (S * 0.1) ** 2 )"
+  },
+  "conditions": {
+    "S(t: 0)": -1
+  },
+  "outputs" : ["S(t)"],
+  "displays": ["plot(x: t, y: S(t: t))"]
+}

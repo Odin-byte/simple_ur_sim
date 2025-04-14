@@ -1,0 +1,17 @@
+{
+  "name": "jerk",
+  "functions": [
+    "X(t)", "Y(t)", "Z(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]": "( 0.2 * X + 3 * Y * Z )",
+    "diff[Y, t]": "( -0.01 * X - 0.4 * Y - 3 * X * Z )",
+    "diff[Z, t]": "0.0 - Z - 3.0 * X * Y"
+  },
+  "conditions": {
+    "X(t: 0)": 0.333
+  },
+  "outputs": ["X(t)", "Y(t)"],
+  "displays": ["plot(x: X(t), y: Y(t))"]
+}

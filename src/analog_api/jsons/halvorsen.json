@@ -1,0 +1,19 @@
+{
+  "name": "halvorsen",
+  "functions": [
+    "X(t)", "Y(t)", "Z(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]":"0.1 * (-1.89 * X - 4 * Y - 4 * Z - 15 * Y * Y)",
+    "diff[Y, t]":"0.1 * (-1.89 * Y - 4 * Z - 4 * X - 15 * Z * Z)",
+    "diff[Z, t]":"0.1 * (-1.89 * Z - 4 * X - 4 * Y - 15 * X * X)"
+  },
+  "conditions": {
+    "X(t: 0)": 0.1,
+    "Y(t: 0)": 0.0,
+    "Z(t: 0)": 0.0
+  },
+  "outputs": ["X", "Y"],
+  "displays": ["plot(x: X, y: Y)"]
+}

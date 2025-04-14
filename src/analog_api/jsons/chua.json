@@ -1,0 +1,21 @@
+{
+  "name": "chua",
+  "functions": [
+    "X(t)", "Y(t)", "Z(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "f1": "abs(0.7143 * X + 0.2857)",
+    "f2": "abs(0.7143 * X - 0.2857)",
+    "f3": "f1 - f2",
+    "fx": "-0.714 * X - 0.3003 * f3",
+    "diff[X, t]":"15.6 * ( Y - X - fx)",
+    "diff[Y, t]":"1 * ( X - Y + Z )",
+    "diff[Z, t]":"-28.58 * Y"
+  },
+  "conditions": {
+    "X(t: 0)": 0.7
+  },
+  "outputs": ["X", "Y"],
+  "displays": ["plot(x: X, y: Y)"]
+}

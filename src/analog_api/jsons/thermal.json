@@ -1,0 +1,21 @@
+{
+  "name": "gray-scott",
+  "functions": [
+    "W(t, x, y)",
+    "P(t, x, y)",
+    "B(t, x, y)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[W, t]": "0.2 * (diff[W, x, x; wrap] + diff[W, y, y; const(0)]) - diff[P, y; const(0)] * diff[W, x; wrap] + diff[P, x; wrap] * diff[W, y; const(0)] + diff[B, x; wrap]",
+    "diff[P, t]": "20 * (diff[P, x, x; wrap] + diff[P, y, y; const(0)] + W)",
+    "diff[B, t]": "0.2 * (diff[B, x, x; wrap] + diff[B, y, y; const(1.0, -1.0)]) - (diff[P, y; const(0)] * diff[B, x; wrap] - diff[P, x; wrap] * diff[B, y; const(1.0, 0.0)])]"
+  },
+  "conditions": {
+    "W(t: 0, x, y)": "0",
+    "P(t: 0, x, y)": "0",
+    "B(t: 0, x, y)": "sphere(pos: #(x, y), center: #(0.7, 0.5), radius: 0.1, inside: 2.0, outside: 0.0)"
+  },
+  "displays": ["grid(plane: fn(x, y) => B(t, x, y), start: #(0, 0), end: #(1, 1), steps: #(50, 50))"],
+  "outputs": ["W(t, x: 0.5, y: 0.5)"]
+}

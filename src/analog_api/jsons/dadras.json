@@ -1,0 +1,19 @@
+{
+  "name": "dadras",
+  "functions": [
+    "X(t)", "Y(t)", "Z(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]": "Y - 3 * X + 54 * Y * Z",
+    "diff[Y, t]": "1.7 * Y - 20 * X * Z + Z",
+    "diff[Z, t]": "40 * X * Y - 9 * Z"
+  },
+  "conditions": {
+    "X(t: 0)": -0.06,
+    "Y(t: 0)": -0.01,
+    "Z(t: 0)": 0.01
+  },
+  "outputs": ["X(t)", "Y(t)"],
+  "displays": ["plot(x: X(t), y: Y(t))"]
+}

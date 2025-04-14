@@ -1,0 +1,15 @@
+{
+  "name": "mass_spring",
+  "functions": [
+    "Y(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[Y, t, t]" :  "-0.5 * (0.05 * diff[Y, t] + 0.5 * Y)"
+  },
+  "conditions": {
+    "Y(t: 0.0)": 1.0
+  },
+  "outputs":[ "Y" ],
+  "displays": ["plot(x: t * 0.02 - 1.0, y: Y)"]
+}

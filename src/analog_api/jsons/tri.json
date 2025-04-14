@@ -1,0 +1,15 @@
+{
+  "name": "tri",
+  "functions": [
+    "Y(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[Y, t, t]": "-1 * Y"
+  },
+  "conditions": {
+    "Y(t: 0)": 1.0
+  },
+  "outputs": ["Y", "diff[Y, t]"],
+  "displays": ["plot(x: Y, y: diff[Y, t])"]
+}

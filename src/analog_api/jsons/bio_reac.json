@@ -1,0 +1,22 @@
+{
+  "name": "bio_reac",
+  "parameters": [],
+  "functions": [
+    "x(t)",
+    "s(t)"
+  ],
+  "equations": {
+    "mu": "0.53 * s / (s + 0.12)",
+    "diff[x, t]": "(mu - 0.3) * x",
+    "diff[s, t]": "0.3 * ( 4 - s ) - (mu / 0.4) * x"
+  },
+  "conditions": {
+    "x(t: 0)": 1,
+    "s(t: 0)": 1
+  },
+  "outputs": ["x", "s"],
+  "displays": [
+    "plot(x: t * 0.2 - 1.0, y: x * 0.5)",
+    "plot(x: t * 0.2 - 1.0, y: s * 0.5)"
+  ]
+}

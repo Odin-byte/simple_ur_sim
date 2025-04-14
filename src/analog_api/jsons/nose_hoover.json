@@ -1,0 +1,17 @@
+{
+  "name": "hoover",
+  "functions": [
+    "X(t)", "Y(t)", "Z(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]": "Y",
+    "diff[Y, t]": "Y * Z - X",
+    "diff[Z, t]": "1 - Y * Y"
+  },
+  "conditions": {
+    "Y(t: 0)": 0.4
+  },
+  "outputs": ["X(t)", "Y(t)"],
+  "displays": ["plot(x: X(t), y: Y(t))"]
+}

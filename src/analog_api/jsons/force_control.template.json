@@ -1,0 +1,17 @@
+{
+    "name": "force_control",
+    "functions": [
+      "Z(t)"
+    ],
+    "parameters": ["M_z", "F_d", "F_ext_z", "D_z", "K_z", "Z(t: 0.0)", "diff[Z, t](t: 0.0)"],
+    "equations": {
+      "diff[Z, t, t]": "(1 / M_z) * ((F_d - F_ext_z) - D_z * diff[Z, t] - K_z * Z)"
+    },
+    "conditions": {
+      "Z(t: 0.0)": 0.0,
+      "diff[Z, t](t: 0.0)": 0.0
+    },
+    "outputs": ["Z"],
+    "displays": ["plot(x: t, y: Z)"]
+  }
+  

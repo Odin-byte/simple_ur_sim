@@ -1,0 +1,17 @@
+{
+  "name": "duffing",
+  "functions": [
+    "X(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t, t]": "0.05 * (cos(t) - 0.02 * diff[X, t] - X - 0.5 * X * X * X)"
+  },
+  "conditions": {
+    "X(t: 0)": 1.0
+  },
+  "outputs": [
+    "X", "diff[X, t]"
+  ],
+  "displays": ["plot(x: X, y: diff[X, t])"]
+}

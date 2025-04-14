@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: analog-api
+Version: 0.1.0
+Summary: A Python API for communicating with a Lucidac API.
+Home-page: UNKNOWN
+Author: Your Name
+Author-email: your.email@example.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent

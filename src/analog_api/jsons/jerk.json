@@ -1,0 +1,15 @@
+{
+  "name": "jerk",
+  "functions": [
+    "X(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t, t, t]":  "9 * diff[X, t] - diff[X, t, t] - X * X * diff[X, t] - 5 * X"
+  },
+  "conditions": {
+    "diff[X, t, t](t: 0)": -1.0
+  },
+  "outputs": ["X", "diff[X, t]"],
+  "displays": ["plot(x: X, y: diff[X, t])"]
+}

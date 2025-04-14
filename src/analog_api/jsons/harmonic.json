@@ -1,0 +1,17 @@
+{
+  "name": "harmonic_oscillator",
+  "functions": [
+    "h(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[h, t, t]": "-h"
+  },
+  "conditions": {
+    "h(t: 0)": 0.42
+  },
+  "outputs": [
+    "h"
+  ],
+  "displays": ["plot(x: t * 0.02 - 1.0, y: h)"]
+}

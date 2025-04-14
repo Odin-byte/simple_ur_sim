@@ -1,0 +1,17 @@
+{
+  "name": "henon_heils",
+  "functions": [
+    "X(t)", "Y(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]": "X * Y",
+    "diff[Y, t]": "0.57 * Y * Y - X * X"
+  },
+  "conditions": {
+    "X(t: 0)": 0.2,
+    "Y(t: 0)": -0.2
+  },
+  "outputs": ["X", "Y"],
+  "displays": ["plot(x: X, y: Y)"]
+}

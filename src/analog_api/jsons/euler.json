@@ -1,0 +1,23 @@
+{
+  "name": "euler",
+  "functions": [
+    "X(t)","Y(t)","U(t)","V(t)","W(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]":"0.6 * U",
+    "diff[Y, t]":"0.6 * V",
+    "diff[U, t]":"-10 * W * V",
+    "diff[V, t]":"10 * W * U",
+    "diff[W, t]":"0.1"
+  },
+  "conditions": {
+    "X(t: 0)": -0.87,
+    "Y(t: 0)": -0.75,
+    "U(t: 0)": -1.0,
+    "V(t: 0)": 0.0,
+    "W(t: 0)": -1.0
+  },
+  "outputs": ["X(t)", "Y(t)"],
+  "displays": ["plot(x: X(t), y: Y(t))"]
+}

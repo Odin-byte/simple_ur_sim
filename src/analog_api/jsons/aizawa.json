@@ -1,0 +1,19 @@
+{
+  "name": "aizawa",
+  "functions": [
+    "X(t)",
+    "Y(t)",
+    "Z(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[X, t]": "( X * ( Z - 0.7 ) - 3.5 * Y )",
+    "diff[Y, t]": "( 3.5 * X + Y * ( Z - 0.7 ) )",
+    "diff[Z, t]": "( 0.6 + 1.0 * Z - Z*Z*Z*0.3333 - (X * X + Y * Y) * (1 + 0.25 * Z) + 0.025 * Z * X * X * X )"
+  },
+  "conditions": {
+    "X(t: 0)": 0.1
+  },
+  "outputs" : ["X", "Y"],
+  "displays": ["plot(x: X, y: Y)"]
+}

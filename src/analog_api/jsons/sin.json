@@ -1,0 +1,11 @@
+{
+  "name": "tri",
+  "functions": [],
+  "parameters": [],
+  "equations": {
+    "Y": "cos(0.5 * t)"
+  },
+  "conditions": {},
+  "outputs": ["Y"],
+  "displays": ["plot(x: t, y: Y)"]
+}

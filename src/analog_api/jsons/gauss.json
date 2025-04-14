@@ -1,0 +1,17 @@
+{
+  "name": "gauss",
+  "functions": [
+    "T(t)", "Y(t)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[Y, t]": "-2 * T * Y",
+    "diff[T, t]": "1.0"
+  },
+  "conditions": {
+    "T(t: 0)": -1.0,
+    "Y(t: 0)": 0.01
+  },
+  "outputs": ["Y(t)"],
+  "displays": ["plot(x: t * 0.02 - 1.0, y: Y(t))"]
+}

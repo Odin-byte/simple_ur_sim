@@ -1,0 +1,15 @@
+{
+  "name": "wave",
+  "functions": [
+    "U(t, x, y)"
+  ],
+  "parameters": [],
+  "equations": {
+    "diff[U, t, t]": "diff[U, x, x; mirror] + diff[U, y, y; mirror]"
+  },
+  "conditions": {
+    "U(t: 0, x, y)": "sphere(pos: #(x, y), center: #(0.25, 0.25), radius: 0.25, inside: 1.0, outside: sphere(pos: #(x, y), center: #(0.75, 0.75), radius: 0.25, inside: -1.0, outside: 0.0))"
+  },
+  "displays": ["grid(plane: fn(x, y) => U(t, x, y), start: #(0, 0), end: #(1, 1), steps: #(50, 50))"],
+  "outputs": ["U(t, x: 0.75, y: 0.75)"]
+}
