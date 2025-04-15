@@ -2,7 +2,7 @@
 import rospy
 import actionlib
 from geometry_msgs.msg import Pose, PoseStamped, Wrench
-from ros_interface_sim.msg import ap_movePoseAction, ap_movePoseGoal
+from ros_ur_msgs.msg import ap_movePoseAction, ap_movePoseGoal
 from threading import Lock
 from analog_api.lucidac_api import LucidacAPI
 

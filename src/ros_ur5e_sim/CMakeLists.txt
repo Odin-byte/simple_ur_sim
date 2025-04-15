@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
   geometry_msgs
+  ros_ur_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -63,18 +64,18 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate actions in the 'action' folder
-add_action_files(
-  FILES
-  ap_movePose.action
-  ap_moveTwist.action
-)
+# add_action_files(
+#   FILES
+#   ap_movePose.action
+#   ap_moveTwist.action
+# )
 
-## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  actionlib_msgs
-  geometry_msgs
-)
+# ## Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   actionlib_msgs
+#   geometry_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -165,7 +166,6 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/ros_ur5e_sim.py
   scripts/ros_ur_control_client.py
-  scripts/ros_ur_control_server.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

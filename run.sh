@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set default values if not provided
-IMAGE_NAME=${1:-ur5e_mujoco}
+IMAGE_NAME=${1:-ur5e_simulation}
 CONTAINER_NAME=${2:-ur5e_sim}
 CONTAINER_WORKSPACE_DIR=${6:-"/ur5e_sim"}  # Default container workspace directory
 

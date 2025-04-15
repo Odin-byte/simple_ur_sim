@@ -3,7 +3,7 @@ import rospy
 from threading import Lock
 import actionlib
 from geometry_msgs.msg import Pose, PoseStamped, Wrench
-from ros_interface_sim.msg import ap_movePoseAction, ap_movePoseResult
+from ros_ur_msgs.msg import ap_movePoseAction, ap_movePoseResult
 
 import pybullet as p
 import numpy as np
@@ -13,6 +13,10 @@ import pybullet_data
 # Transformation from world to robot
 TRANSLATION_VECTOR = [0.0, 0.0, 0.6]
 ROTATION_VECTOR = [0.0, 0.0, 0.0, 1.0]
+
+# PID values for torque control
+KP = 200.0
+KD = 10
 
 
 class Ur_PyBullet_Ros_Sim:
@@ -48,6 +52,9 @@ class Ur_PyBullet_Ros_Sim:
         self.current_tcp_pose = None
         self.ur5e_id = None
         self.JOINT_INDICES = list(range(2, 8))
+
+        self.previous_joint_command = [0.0] * len(self.JOINT_INDICES)
+        self.alpha = 0.05  # Smoothing factor: closer to 0 = more lag
 
         # Initialize PyBullet
         self.connect_to_pybullet()
@@ -97,7 +104,7 @@ class Ur_PyBullet_Ros_Sim:
 
         # Wait for the simulation to reach the goal
         success = False
-        rate = rospy.Rate(500)  # 500 Hz
+        rate = rospy.Rate(100)  # 100 Hz
         timeout = rospy.Time.now() + rospy.Duration(10)  # 10-second timeout
 
         while rospy.Time.now() < timeout:
@@ -220,7 +227,7 @@ class Ur_PyBullet_Ros_Sim:
 
     def run_simulation(self):
         """Main simulation loop."""
-        rate = rospy.Rate(500)  # 500 Hz
+        rate = rospy.Rate(100)  # 100 Hz
 
         # Setup the FT-sensor
         p.enableJointForceTorqueSensor(self.ur5e_id, jointIndex=9)
@@ -243,18 +250,29 @@ class Ur_PyBullet_Ros_Sim:
                 control_values = (self.requested_position, self.requested_orientation)
 
             if control_values[0] is not None and control_values[1] is not None:
-                # Calculate inverse kinematics and apply control
-                joint_values = p.calculateInverseKinematics(
+                # Calculate raw IK joint targets
+                joint_values = list(p.calculateInverseKinematics(
                     self.ur5e_id,
                     endEffectorLinkIndex=10,
                     targetPosition=control_values[0],
                     targetOrientation=control_values[1],
-                )
+                ))
+
+                # Apply exponential smoothing to simulate actuator delay
+                smoothed_joint_values = []
+                for i in range(len(self.JOINT_INDICES)):
+                    new_val = self.alpha * joint_values[i] + (1 - self.alpha) * self.previous_joint_command[i]
+                    smoothed_joint_values.append(new_val)
+
+                # Update previous command
+                self.previous_joint_command = smoothed_joint_values
+
+                # Send the smoothed command to the robot
                 p.setJointMotorControlArray(
                     self.ur5e_id,
                     jointIndices=self.JOINT_INDICES,
                     controlMode=p.POSITION_CONTROL,
-                    targetPositions=joint_values,
+                    targetPositions=smoothed_joint_values,
                 )
 
             p.stepSimulation()  # Step the simulation to apply the control

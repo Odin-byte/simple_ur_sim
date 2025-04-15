@@ -73,8 +73,16 @@ COPY ./src ./src
 RUN bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && catkin build"
 RUN echo "source /home/${USER}/ros_ws/devel/setup.bash" >> /home/${USER}/.bashrc
 
+# Build analog api pkg
+USER root
+WORKDIR /home/${USER}/ros_ws/src/analog_api
+RUN pip install -e .
+
+USER ${USER}
+WORKDIR /home/${USER}/ros_ws
+
 ##############################################################################
 ##                           Start the container                            ##
 ##############################################################################
 
-CMD ["source /devel/setup.bash"]
+CMD ["bash"]

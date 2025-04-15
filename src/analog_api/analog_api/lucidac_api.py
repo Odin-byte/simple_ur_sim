@@ -214,8 +214,9 @@ if __name__ == "__main__":
     luci_api = LucidacAPI(host="localhost", port=5000)
     print(f"Testing compiler!")
     json_ode = luci_api.adapt_json_template("force_control", {"M_z": 7}, set_missing_values_to_one=True)
+    print(json_ode)
     luci_api.compile_json_ode(json_ode)
-    print(f"Got config: {luci_api.current_config}")
+    print(luci_api.current_config['00-00-00-00-00-00']['/0']['/M0'])
     # luci_api.load_ode_from_file("force_control")
     # if luci_api.current_config != None:
     #     print(f"Got config: {luci_api.current_config}")
