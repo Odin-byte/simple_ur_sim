@@ -204,7 +204,8 @@ class Ur_PyBullet_Ros_Sim:
         actual_TCP_pose = p.getLinkState(self.ur5e_id, 10, computeForwardKinematics=1)[
             :2
         ]
-        self.current_tcp_pose = self.transform_tcp_to_base(actual_TCP_pose)
+        # self.current_tcp_pose = self.transform_tcp_to_base(actual_TCP_pose)
+        # self.current_tcp_pose = ([actual_TCP_pose[0][0] - TRANSLATION_VECTOR[0], actual_TCP_pose[0][1] - TRANSLATION_VECTOR[1], actual_TCP_pose[0][2] - TRANSLATION_VECTOR[2]], actual_TCP_pose[1])
 
         # Publish the current pose to the ROS network
         pose_msg = PoseStamped()
@@ -214,16 +215,19 @@ class Ur_PyBullet_Ros_Sim:
         pose_msg.header.stamp.nsecs = current_time.nsecs
         pose_msg.header.frame_id = "base"
 
-        pose_msg.pose.position.x = self.current_tcp_pose[0][0]
-        pose_msg.pose.position.y = self.current_tcp_pose[0][1]
-        pose_msg.pose.position.z = self.current_tcp_pose[0][2]
+        pose_msg.pose.position.x = actual_TCP_pose[0][0] - TRANSLATION_VECTOR[0]
+        pose_msg.pose.position.y = actual_TCP_pose[0][1] - TRANSLATION_VECTOR[1]
+        pose_msg.pose.position.z = actual_TCP_pose[0][2] - TRANSLATION_VECTOR[2]
 
-        pose_msg.pose.orientation.x = self.current_tcp_pose[1][0]
-        pose_msg.pose.orientation.y = self.current_tcp_pose[1][1]
-        pose_msg.pose.orientation.z = self.current_tcp_pose[1][2]
-        pose_msg.pose.orientation.w = self.current_tcp_pose[1][3]
+        pose_msg.pose.orientation.x = actual_TCP_pose[1][0]
+        pose_msg.pose.orientation.y = actual_TCP_pose[1][1]
+        pose_msg.pose.orientation.z = actual_TCP_pose[1][2]
+        pose_msg.pose.orientation.w = actual_TCP_pose[1][3]
 
         self._pose_pub.publish(pose_msg)
+
+        self.current_tcp_pose = ([actual_TCP_pose[0][0] - TRANSLATION_VECTOR[0], actual_TCP_pose[0][1] - TRANSLATION_VECTOR[1], actual_TCP_pose[0][2] - TRANSLATION_VECTOR[2]], actual_TCP_pose[1])
+
 
     def run_simulation(self):
         """Main simulation loop."""
