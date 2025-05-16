@@ -59,14 +59,14 @@ class LucidacAPI:
         try:
             with open(f"{self.json_folder + json_name}.template.json") as file:
                 json_template = json.load(file)
-                print(f"Got template: {json_template}")
+                # print(f"Got template: {json_template}")
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error reading template file {json_name}.template.json: {e}")
 
         # Get all needed parameters to adapt the given template (variables + initial conditions)
         needed_parameters = json_template["parameters"] + list(json_template["conditions"].keys())
 
-        print(needed_parameters)
+        # print(needed_parameters)
 
         # Check if all needed parameters are given
         try:
@@ -179,6 +179,33 @@ class LucidacAPI:
                 raise ValueError("No valid config was returned!")
         except (requests.RequestException, ValueError) as e:
             print(f"Caught error {e} while trying to compile {ode_name} ODE.")
+
+    def simulate_json_ode(self, json_ode: dict, op_secs: float, sample_rate: int, sample_all: bool = False, k0: int = 1):
+        # Create the simulate request
+        request_data = {
+            "ode": json_ode,
+            "op_secs": op_secs,
+            "sample_rate": sample_rate,
+            "sample_all": sample_all,
+            "k0": k0
+        }
+
+        # print(f"Request data: {request_data}")
+        try:
+            # Send simulation request
+            sim_response = requests.post(
+                f"{self.url}/api/v0/simulate",
+                headers={"Content-Type": "application/json"},
+                json=request_data
+            )
+            sim_response.raise_for_status()
+            
+            response = json.loads(json.dumps(sim_response.json(), indent=2))
+        
+        except requests.RequestException as e:
+            print(f"Caught error {e} while trying to simulate ODE.")
+            response = None
+        return response
 
     def calculate_current_ode(
         self, op_secs: float, sample_rate: int) -> list:
