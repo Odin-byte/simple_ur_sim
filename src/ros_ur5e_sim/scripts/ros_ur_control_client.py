@@ -14,10 +14,10 @@ PRE_PRESS_POS = [-0.5, -0.2, 0.05]
 PRESS_POS = [-0.5, -0.2, 0.0]
 
 # Variables for the simulation
-WANTED_FORCE = 500 #Newton
+WANTED_FORCE = 1700 #Newton
 
 # Control values
-M = 6000.0
+M = 300.0
 D = 0
 K = 0
 
@@ -124,7 +124,7 @@ class RosUrControlClient:
                     continue
             # Extract the Z-force from the current force values
             z_force = round(current_wrench.force.z + 10.79107, 4) # N
-            print(f"Z-force: {z_force}")
+            print(f"Current Z-force: {z_force}")
             
             
             # Prepare the needed variable dict
@@ -134,20 +134,21 @@ class RosUrControlClient:
                 "F_ext_z" : -z_force,
                 "D_z" : D,
                 "K_z" : K,
-                "Z(t: 0.0)" : 0.0,
+                "Z(t: 0.0)" : round(z_pos, 4),
                 "diff[Z, t](t: 0.0)" : 0.0,
             }
 
             # Adapt the force control template ode
             json_ode = self.luci_api.adapt_json_template("force_control", ode_vars)
 
-            print(json_ode)
+            # print(json_ode)
             # Compile the json ode
-            needed_displacement = self.luci_api.simulate_json_ode(json_ode, op_secs=0.01, sample_rate=100000)["samples"][0]
-            print(needed_displacement[0])
+            needed_displacement = self.luci_api.simulate_json_ode(json_ode, op_secs=0.01, sample_rate=100000)["samples"]
+            # print(f"Got displacement: {needed_displacement[-1][0]}")
             # Calculate the new position
-            z_pos = z_pos + needed_displacement[0]
-            needed_pos[2] = z_pos
+            z_pos = z_pos - needed_displacement[-1][0]
+            # print(f"New z_pos: {z_pos}")
+            needed_pos[2] = needed_pos[2] - round(z_pos, 4)
             # Move the robot to the new position
             self.send_goal(needed_pos, QUAT_FACING_DOWN)
             rate.sleep()

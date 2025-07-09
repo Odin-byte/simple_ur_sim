@@ -9,6 +9,7 @@ class LucidacAPI:
     ):
         self.host = host
         self.port = port
+        self.mac_addr = "04-E9-E5-17-E5-DE"
 
         self.json_folder = json_folder
         self.current_config = None
@@ -180,7 +181,7 @@ class LucidacAPI:
         except (requests.RequestException, ValueError) as e:
             print(f"Caught error {e} while trying to compile {ode_name} ODE.")
 
-    def simulate_json_ode(self, json_ode: dict, op_secs: float, sample_rate: int, sample_all: bool = False, k0: int = 1):
+    def simulate_json_ode(self, json_ode: dict, op_secs: float, sample_rate: int, sample_all: bool = True, k0: int = 1):
         # Create the simulate request
         request_data = {
             "ode": json_ode,
@@ -201,6 +202,69 @@ class LucidacAPI:
             sim_response.raise_for_status()
             
             response = json.loads(json.dumps(sim_response.json(), indent=2))
+        
+        except requests.RequestException as e:
+            print(f"Caught error {e} while trying to simulate ODE.")
+            response = None
+        return response
+    
+    def run_json_on_lucidac(self, json_ode: dict, op_secs: float, sample_rate: int, sample_all: bool = True, k0: int = 1):
+        # Create request data
+        request_data = {
+            "backend": "lucidac",
+            "data": json_ode
+        }
+        print(f"Request data: {request_data}")
+        
+        # Send compilation request
+        print("Sending json to API...")
+        try:
+            response = requests.post(
+                f"{self.url}/api/v0/compile",
+                headers={"Content-Type": "application/json"},
+                json=request_data
+            )
+            response.raise_for_status()
+            compile_response = response.json()
+            
+            print("API Compile Response:")
+            print(json.dumps(compile_response))
+            
+            # Extract config for simulation
+            config = compile_response.get('config')
+            
+            # Ensure the MAC-addr is correct
+            # config[self.mac_addr] = config.pop("00-00-00-00-00-00")
+            print(f"Sending config: {config}")
+            
+            # Check if we have a valid config
+            if not config:
+                print("Failed to get valid config from compile response. Skipping simulation.")
+            else:
+                print("Using extracted config for simulation...")
+
+                print(sample_rate)
+                
+                # Create the simulation request with the extracted config
+                sim_request = {
+                "config": config,
+                "op_secs": op_secs,
+                "sample_rate": sample_rate,
+                "sample_all": sample_all,
+                "k0": k0,
+                "device": "lucidac"
+                }
+                
+                # Send simulation request
+                print("Sending simulation request to API...")
+                sim_response = requests.post(
+                    f"{self.url}/api/v0/run",
+                    headers={"Content-Type": "application/json"},
+                    json=sim_request
+                )
+                sim_response.raise_for_status()
+                
+                response = json.loads(json.dumps(sim_response.json(), indent=2))
         
         except requests.RequestException as e:
             print(f"Caught error {e} while trying to simulate ODE.")
